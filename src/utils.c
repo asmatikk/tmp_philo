@@ -48,36 +48,67 @@ long int	timestamp(void)
 	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
-int	check_philos_death(t_philo	*philo)
+int    check_philos_death(t_philo    *philo)
 {
-	long int	current;
-	long int	die;
-	long int	eat;
+    long int    current;
+	long int    last;
 
-	current = timestamp() - philo->table->start_routine;
-	pthread_mutex_lock(&philo->table->death);
-	if (philo->table->nb_death >= 1)
-	{
-		pthread_mutex_unlock(&philo->table->death);
-		return (1);
-	}
-	pthread_mutex_lock(&philo->table->last_m);
-	die = (philo->last_meal + philo->table->t_to_die / 1000) - philo->table->start_routine;
-	pthread_mutex_unlock(&philo->table->last_m);
-	eat = (current + philo->table->t_to_eat / 1000);
-	printf("die: %ld eat:%ld\n", die, eat);
-	if (die < eat)
-	{
-		if (philo->table->nb_death == 0)
-		{
-			philo->table->nb_death++;
-			pthread_mutex_unlock(&philo->table->death);
-			print_routine_else(philo, 'd');
-			pthread_mutex_lock(&philo->table->death);
-		}
-		pthread_mutex_unlock(&philo->table->death);
-		return (1);
-	}
-	pthread_mutex_unlock(&philo->table->death);
-	return (0);
+    current = timestamp() - philo->table->start_routine;
+    pthread_mutex_lock(&philo->table->death);
+    if (philo->table->nb_death >= 1)
+    {
+        pthread_mutex_unlock(&philo->table->death);
+        return (1);
+    }
+    pthread_mutex_lock(&philo->table->last_m);
+	last = philo->last_meal;
+    pthread_mutex_unlock(&philo->table->last_m);
+	if (current - last >= philo->table->t_to_die / 1000)
+    {
+        if (philo->table->nb_death == 0)
+        {
+            philo->table->nb_death++;
+            pthread_mutex_unlock(&philo->table->death);
+            print_routine_else(philo, 'd');
+            pthread_mutex_lock(&philo->table->death);
+        }
+        pthread_mutex_unlock(&philo->table->death);
+        return (1);
+    }
+    pthread_mutex_unlock(&philo->table->death);
+    return (0);
 }
+
+// int	check_philos_death(t_philo	*philo)
+// {
+// 	long int	current;
+// 	long int	die;
+// 	long int	eat;
+
+// 	current = timestamp() - philo->table->start_routine;
+// 	pthread_mutex_lock(&philo->table->death);
+// 	if (philo->table->nb_death >= 1)
+// 	{
+// 		pthread_mutex_unlock(&philo->table->death);
+// 		return (1);
+// 	}
+// 	pthread_mutex_lock(&philo->table->last_m);
+// 	die = (philo->last_meal + philo->table->t_to_die / 1000) - philo->table->start_routine;
+// 	pthread_mutex_unlock(&philo->table->last_m);
+// 	eat = (current + philo->table->t_to_eat / 1000);
+// 	printf("die: %ld eat:%ld\n", die, eat);
+// 	if (die < eat)
+// 	{
+// 		if (philo->table->nb_death == 0)
+// 		{
+// 			philo->table->nb_death++;
+// 			pthread_mutex_unlock(&philo->table->death);
+// 			print_routine_else(philo, 'd');
+// 			pthread_mutex_lock(&philo->table->death);
+// 		}
+// 		pthread_mutex_unlock(&philo->table->death);
+// 		return (1);
+// 	}
+// 	pthread_mutex_unlock(&philo->table->death);
+// 	return (0);
+// }
