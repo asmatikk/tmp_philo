@@ -59,28 +59,52 @@ void	destroy_mutex(t_table *table)
 	free(table->philo);
 	free(table);
 }
-
-int	main(int ac, char **av)
+int    main(int ac, char **av)
 {
-	t_table	*table;
-	int		i;
+    t_table    *table;
+    int        i;
 
-	table = NULL;
-	if (check_input(ac, av) == 1)
-		return (printf("erreur input\n"), 1);
-	table = malloc(sizeof(t_table));
-	if (!table)
-		return (0);
-	init_struct_table(table, ac, av);
-	i = 0;
-	while (i < table->nb_philo)
-	{
-		table->philo[i].last_meal = timestamp() + table->t_to_die / 1000;
-		pthread_create(&table->philo[i].thread,
-			NULL, &philo_routine, &table->philo[i]);
-		usleep(200);
-		i++;
-	}
-	destroy_mutex(table);
-	return (0);
+    table = NULL;
+    if (check_input(ac, av) == 1)
+        return (printf("erreur input\n"), 1);
+    table = malloc(sizeof(t_table));
+    if (!table)
+        return (0);
+    init_struct_table(table, ac, av);
+    i = 0;
+    while (i < table->nb_philo)
+    {
+	    table->philo[i].last_meal = 0;
+        pthread_create(&table->philo[i].thread,
+            NULL, &philo_routine, &table->philo[i]);
+        usleep(200);
+        i++;
+    }
+    destroy_mutex(table);
+    return (0);
 }
+
+// int	main(int ac, char **av)
+// {
+// 	t_table	*table;
+// 	int		i;
+
+// 	table = NULL;
+// 	if (check_input(ac, av) == 1)
+// 		return (printf("erreur input\n"), 1);
+// 	table = malloc(sizeof(t_table));
+// 	if (!table)
+// 		return (0);
+// 	init_struct_table(table, ac, av);
+// 	i = 0;
+// 	while (i < table->nb_philo)
+// 	{
+// 		table->philo[i].last_meal = timestamp() + table->t_to_die / 1000;
+// 		pthread_create(&table->philo[i].thread,
+// 			NULL, &philo_routine, &table->philo[i]);
+// 		usleep(200);
+// 		i++;
+// 	}
+// 	destroy_mutex(table);
+// 	return (0);
+// }

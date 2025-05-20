@@ -30,34 +30,83 @@ int	philo_alone(t_philo *philo)
 	print_routine_else(philo, 't');
 	return (0);
 }
-
-void	print_routine_eat(t_philo *philo, char c)
+void    print_routine_eat(t_philo *philo, char c)
 {
-	long int	time;
+    long int    time;
 
-	pthread_mutex_lock(&philo->table->death);
-	if (philo->table->nb_death >= 1)
-	{
-		pthread_mutex_unlock(&philo->table->death);
-		return ;
-	}
-	pthread_mutex_unlock(&philo->table->death);
-	pthread_mutex_lock(&philo->table->print);
-	time = timestamp() - philo->table->start_routine;
-	if (c == 'f')
-	{
-		printf("%s%ld %d has taken a fork%s\n",BWHITE, time, philo->id, RESET);
-		pthread_mutex_unlock(&philo->table->print);
-	}
-	if (c == 'e')
-	{
-		printf("%s%ld %d is eating%s\n", BRED, time, philo->id, RESET);
-		pthread_mutex_unlock(&philo->table->print);
-		usleep(philo->table->t_to_eat);
-		pthread_mutex_lock(&philo->table->last_m);
-		philo->last_meal = timestamp();
-		pthread_mutex_unlock(&philo->table->last_m);
-	}
+    pthread_mutex_lock(&philo->table->death);
+    if (philo->table->nb_death >= 1)
+    {
+        pthread_mutex_unlock(&philo->table->death);
+        return ;
+    }
+    pthread_mutex_unlock(&philo->table->death);
+    pthread_mutex_lock(&philo->table->print);
+    time = timestamp() - philo->table->start_routine;
+    if (c == 'f')
+    {
+        printf("%s%ld %d has taken a fork%s\n",BWHITE, time, philo->id, RESET);
+        pthread_mutex_unlock(&philo->table->print);
+    }
+    if (c == 'e')
+    {
+        printf("%s%ld %d is eating%s\n", BRED, time, philo->id, RESET);
+        pthread_mutex_unlock(&philo->table->print);
+        pthread_mutex_lock(&philo->table->last_m);
+        philo->last_meal = timestamp() - philo->table->start_routine;
+        pthread_mutex_unlock(&philo->table->last_m);
+	    usleep(philo->table->t_to_eat);
+    }
+}
+// void	print_routine_eat(t_philo *philo, char c)
+// {
+// 	long int	time;
+
+// 	pthread_mutex_lock(&philo->table->death);
+// 	if (philo->table->nb_death >= 1)
+// 	{
+// 		pthread_mutex_unlock(&philo->table->death);
+// 		return ;
+// 	}
+// 	pthread_mutex_unlock(&philo->table->death);
+// 	pthread_mutex_lock(&philo->table->print);
+// 	time = timestamp() - philo->table->start_routine;
+// 	if (c == 'f')
+// 	{
+// 		printf("%s%ld %d has taken a fork%s\n",BWHITE, time, philo->id, RESET);
+// 		pthread_mutex_unlock(&philo->table->print);
+// 	}
+// 	if (c == 'e')
+// 	{
+// 		printf("%s%ld %d is eating%s\n", BRED, time, philo->id, RESET);
+// 		pthread_mutex_unlock(&philo->table->print);
+// 		usleep(philo->table->t_to_eat);
+// 		pthread_mutex_lock(&philo->table->last_m);
+// 		philo->last_meal = timestamp();
+// 		pthread_mutex_unlock(&philo->table->last_m);
+// 	}
+// }
+
+void    precise_sleep(long sleep_duration, t_philo *philo)
+{
+    long    start_time;
+
+    start_time = get_time();
+    while ((get_time() - start_time)* 1000 < sleep_duration)
+    {
+        if (check_death(philo) == -1)
+            break ;
+        pthread_mutex_lock(&philo->data->mutex_alive);
+        if (!philo->data->is_alive)
+        {
+            pthread_mutex_unlock(&philo->data->mutex_alive);
+            break ;
+        }
+        pthread_mutex_unlock(&philo->data->mutex_alive);
+        if (check_death(philo) == -1)
+            break ;
+        usleep(500);
+    }
 }
 
 void	print_routine_else(t_philo *philo, char c)
