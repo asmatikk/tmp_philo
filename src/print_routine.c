@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   print_routine.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: afrikach <afrikach@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asma <asma@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:26:51 by afrikach          #+#    #+#             */
-/*   Updated: 2024/12/13 17:30:21 by afrikach         ###   ########.fr       */
+/*   Updated: 2025/05/22 17:45:00 by asma             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,19 +91,19 @@ void    precise_sleep(long sleep_duration, t_philo *philo)
 {
     long    start_time;
 
-    start_time = get_time();
-    while ((get_time() - start_time)* 1000 < sleep_duration)
+    start_time = timestamp();
+    while ((timestamp() - start_time)* 1000 < sleep_duration)
     {
-        if (check_death(philo) == -1)
+        if (check_philos_death(philo) == -1)
             break ;
-        pthread_mutex_lock(&philo->data->mutex_alive);
-        if (!philo->data->is_alive)
+        pthread_mutex_lock(&philo->table->death);
+        if (!philo->table->nb_death)
         {
-            pthread_mutex_unlock(&philo->data->mutex_alive);
+            pthread_mutex_unlock(&philo->table->death);
             break ;
         }
-        pthread_mutex_unlock(&philo->data->mutex_alive);
-        if (check_death(philo) == -1)
+        pthread_mutex_unlock(&philo->table->death);
+        if (check_philos_death(philo) == -1)
             break ;
         usleep(500);
     }
@@ -126,7 +126,8 @@ void	print_routine_else(t_philo *philo, char c)
 	{
 		printf("%s%ld %d is sleeping%s\n", BBLUE, time, philo->id, RESET);
 		pthread_mutex_unlock(&philo->table->print);
-		usleep(philo->table->t_to_sleep);
+		precise_sleep(philo->table->t_to_sleep, philo);
+		//usleep(philo->table->t_to_sleep);
 	}
 	if (c == 't')
 	{
