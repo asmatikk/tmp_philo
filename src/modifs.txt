@@ -1,0 +1,39 @@
+
+J'ai changé:
+	-> la condition de calcul de la mort
+	-> last_meal a 0
+	-> last_meal = time_stamp - start quand se met a jour
+	-> last_meal se met a jour /avant/ le usleep
+	-> [//PAS NECESSAIRE] ajout de is thinking au debut de la routine pour le visualizer
+
+Il faut:
+	-> changer les usleep() par une fonction qui verifie petit a petit s'il sont morts
+		ex: au lieu de usleep(1000):
+		void sleep_precis()
+		{
+			while (temps passe < 1000)
+			{
+				usleep(100)
+				if check_death = 1
+					return
+				temps passe = temps passe + 100
+			}
+		}
+	-> qd meme faire prendre la fourchette au philo quand il n'y en a qu'un seul
+	-> revoir le usleep(200) au moment de lancer les threads:
+		les philos meurent quand il y en a bcp en nombre pair (38-40 philos et +)
+		-> cree un trop grand decalage les philos ne sont plus synchros
+	-> peut-etre ajouter un thread de monitoring
+		l'annonce de la mort se fait trop tard dans certains cas (4 310 200 100)
+	-> pb grand nombre pair de philo: le dernier philo n'a pas le temps de manger
+		> faire penser les philos a la fin de la routine en calculant le temps qu'il leur reste avant de mourir divise par deux
+		ex : temps qu'il lui reste avant de mourir = timetodie - (current - last_ate)
+			if (temps qu'il lui reste > 0)
+				sleep_precis(temps qu'il reste/2)  [//peut_etre * 1000 mais pas sure]
+
+dans utils faire une condition avant ca :
+
+"if (current - last > philo->table->t_to_die / 1000 
+		|| philo->table->t_to_eat + philo->table->t_to_sleep > philo->table->t_to_die)"
+pour qu'il meurent pile au moment ou t to die est depasse.
+faire ca dans une fonction a part.

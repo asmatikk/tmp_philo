@@ -12,8 +12,6 @@
 
 #include "../philo.h"
 
-//check if only digits
-
 int	check_digit(char *str)
 {
 	int	i;
@@ -40,9 +38,7 @@ int	check_input(int ac, char **av)
 			return (1);
 		if (ac > 6 || ac < 5)
 			return (1);
-		nb = ft_atoi(av[1]);
-		if (i != 1 && nb == -1)
-			return (1);
+		nb = ft_atoi(av[i]);
 		if (nb <= 0)
 			return (1);
 		i++;

@@ -59,7 +59,7 @@ typedef struct s_table
 }					t_table;
 
 int			check_input(int ac, char **av);
-void		init_struct_table(t_table *table, int ac, char **av);
+int			init_struct_table(t_table *table, int ac, char **av);
 void		init_struct_philo(t_table *table);
 int			ft_atoi(const char *str);
 void		*philo_routine(void *arg);
@@ -70,5 +70,8 @@ void		print_routine_else(t_philo *philo, char c);
 int			check_philos_death(t_philo	*philo);
 void		philo_eat(t_philo *philo, t_table *table);
 int			philo_alone(t_philo *philo);
+void  		precise_timer(long timing, t_philo *philo);
+void		is_thinking(t_philo *philo);
+void		*monitoring(void *arg);
 
 #endif
